@@ -14,11 +14,16 @@ app.listen(3000, () => {
 /* FUNCAO PARA ATULAIZAR A LISTA DOS JOGADORES COM OS PREÇOS DA WATCHLIST */
 app.post("/updateTransfer", (req, res, next) => {
   var playersList = req.body;
+  console.log("UPDATE TRANSFER LIST");
   checkList(playersList)
     .then(() => {
       res.json({ success: "players refreshed with success" });
     })
-    .catch();
+    .catch(err => {
+      console.log("*****************LOG ERR*****************");
+      console.log("ERRO NO updateTransfer");
+      console.log(err);
+    });
 });
 
 /* FUNCAO QUE VERIFICA SE O JOGADOR EXISTE NO FICHEIRO */
@@ -31,53 +36,62 @@ var checkIDonList = function(idPlayer, auctionID, currentBid) {
       if (arrayIDsColumn.includes(parseInt(idPlayer))) {
         nameCol.eachCell(function(cell, rowNumber) {
           if (parseInt(idPlayer) === parseInt(cell.value)) {
-            checkIDOnArray(auctionID, rowNumber).then(result => {
-              if (result === "Auction already registered") {
-                resolve("Auction already registered");
-              } else if (result === "Auction not registered") {
-                var nameRow = worksheet.getRow(rowNumber);
-                var lastAdded = nameRow.getCell("I").value;
-                switch (lastAdded) {
-                  case "B":
-                    nameRow.getCell("C").value = currentBid;
-                    nameRow.getCell("I").value = "C";
-                    break;
-                  case "C":
-                    nameRow.getCell("D").value = currentBid;
-                    nameRow.getCell("I").value = "D";
-                    break;
-                  case "D":
-                    nameRow.getCell("E").value = currentBid;
-                    nameRow.getCell("I").value = "E";
-                    break;
-                  case "E":
-                    nameRow.getCell("F").value = currentBid;
-                    nameRow.getCell("I").value = "F";
-                    break;
-                  case "F":
-                    nameRow.getCell("G").value = currentBid;
-                    nameRow.getCell("I").value = "G";
-                    break;
-                  case "G":
-                    nameRow.getCell("H").value = currentBid;
-                    nameRow.getCell("I").value = "H";
-                    break;
-                  case "H":
-                    nameRow.getCell("B").value = currentBid;
-                    nameRow.getCell("I").value = "B";
-                    break;
+            checkIDOnArray(auctionID, rowNumber)
+              .then(result => {
+                if (result === "Auction already registered") {
+                  resolve("Auction already registered");
+                } else if (result === "Auction not registered") {
+                  var nameRow = worksheet.getRow(rowNumber);
+                  var lastAdded = nameRow.getCell("I").value;
+                  switch (lastAdded) {
+                    case "B":
+                      nameRow.getCell("C").value = currentBid;
+                      nameRow.getCell("I").value = "C";
+                      break;
+                    case "C":
+                      nameRow.getCell("D").value = currentBid;
+                      nameRow.getCell("I").value = "D";
+                      break;
+                    case "D":
+                      nameRow.getCell("E").value = currentBid;
+                      nameRow.getCell("I").value = "E";
+                      break;
+                    case "E":
+                      nameRow.getCell("F").value = currentBid;
+                      nameRow.getCell("I").value = "F";
+                      break;
+                    case "F":
+                      nameRow.getCell("G").value = currentBid;
+                      nameRow.getCell("I").value = "G";
+                      break;
+                    case "G":
+                      nameRow.getCell("H").value = currentBid;
+                      nameRow.getCell("I").value = "H";
+                      break;
+                    case "H":
+                      nameRow.getCell("B").value = currentBid;
+                      nameRow.getCell("I").value = "B";
+                      break;
+                  }
+                  var arrayAuct = nameRow.getCell("J").value;
+                  nameRow.getCell("J").value =
+                    arrayAuct + ',"' + auctionID + '"';
+                  workbook.xlsx
+                    .writeFile(strFilename)
+                    .then(function() {})
+                    .catch(err => {
+                      console.log("*****************LOG ERR*****************");
+                      console.log("ERRO NO registar");
+                      console.log(err);
+                    });
+                  resolve();
                 }
-                var arrayAuct = nameRow.getCell("J").value;
-                nameRow.getCell("J").value = arrayAuct + ',"' + auctionID + '"';
-                workbook.xlsx
-                  .writeFile(strFilename)
-                  .then(function() {})
-                  .catch(() => {
-                    console.log("err ao registar");
-                  });
-                resolve();
-              }
-            });
+              })
+              .catch(err => {
+                console.log("*****************LOG ERR*****************");
+                console.log("ERRO NO checkIDonList");
+                console.log(err);
+              });
           }
         });
       } else {
@@ -90,8 +104,10 @@ var checkIDonList = function(idPlayer, auctionID, currentBid) {
         workbook.xlsx
           .writeFile(strFilename)
           .then(function() {})
-          .catch(() => {
-            console.log("err ao registar");
+          .catch(err => {
+            console.log("*****************LOG ERR*****************");
+            console.log("ERRO NO registar");
+            console.log(err);
           });
         resolve("Not Existent");
       }
@@ -115,6 +131,7 @@ var checkList = function(listPlayers) {
         tradeState === "closed" &&
         parseInt(currentBid) !== parseInt(startingBid)
       ) {
+        console.log(idPlayer);
         checkIDonList(idPlayer, auctionID, currentBid).then(data => {
           zero++;
           if (zero === numeroPlayersToCheck) {
