@@ -2,11 +2,11 @@ var express = require("express");
 var app = express();
 const Excel = require("exceljs");
 var bodyParser = require("body-parser");
-
+var cors = require("cors");
 app.use(bodyParser.json());
 var workbook = new Excel.Workbook();
 var strFilename = "dados.xlsx";
-
+app.use(cors());
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
