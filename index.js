@@ -13,7 +13,7 @@ app.listen(3000, () => {
 
 /* FUNCAO PARA ATULAIZAR A LISTA DOS JOGADORES COM OS PREÇOS DA WATCHLIST */
 app.post("/updateTransfer", (req, res, next) => {
-  var playersList = req.body;
+  var playersList = req.body.auctions;
   console.log(playersList);
   console.log(typeof playersList);
   console.log("UPDATE TRANSFER LIST");
