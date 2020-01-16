@@ -14,8 +14,6 @@ app.listen(3000, () => {
 /* FUNCAO PARA ATULAIZAR A LISTA DOS JOGADORES COM OS PREÇOS DA WATCHLIST */
 app.post("/updateTransfer", (req, res, next) => {
   var playersList = req.body.auctions;
-  console.log(playersList);
-  console.log(typeof playersList);
   console.log("UPDATE TRANSFER LIST");
   checkList(playersList)
     .then(() => {
@@ -124,7 +122,7 @@ var checkList = function(listPlayers) {
     var numeroPlayersToCheck = listPlayers.length;
     var zero = 0;
     listPlayers.forEach(player => {
-      var idPlayer = player.itemData.id;
+      var idPlayer = player.itemData.assetId;
       var auctionID = player.tradeId;
       var tradeState = player.tradeState;
       var currentBid = player.currentBid;
